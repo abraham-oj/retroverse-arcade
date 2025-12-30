@@ -1,0 +1,22 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import GameConsole from '../components/GameConsole';
+import GameLibrary from '../components/GameLibrary.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="RetroVerse Arcade">
+  <Header />
+  <Hero />
+
+  <section id="arcade" class="py-12 bg-gray-900 relative">
+    <div class="container mx-auto px-4">
+      <GameConsole client:load selectedGame="snake" />
+    </div>
+  </section>
+
+  <GameLibrary />
+  <Footer />
+</Layout>

@@ -1,0 +1,150 @@
+---
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content="RetroVerse Arcade - Juegos retro clásicos en tu navegador" />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="crt-flicker relative min-h-screen flex flex-col">
+    <div id="crt-overlay" class="crt fixed inset-0 w-full h-full pointer-events-none z-50"></div>
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --neon-pink: #ff00ff;
+    --neon-cyan: #00ffff;
+    --neon-green: #00ff00;
+    --bg-dark: #050510;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: var(--bg-dark);
+    color: #e0e0e0;
+    font-family: 'VT323', monospace;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+  }
+
+  h1, h2, h3, .pixel-font {
+    font-family: 'Press Start 2P', cursive;
+  }
+
+  .glow-text {
+    text-shadow: 0 0 5px var(--neon-cyan);
+  }
+
+  .glow-text-pink {
+    text-shadow: 0 0 5px var(--neon-pink);
+  }
+
+  .crt::before {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+      linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    z-index: 50;
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none;
+  }
+
+  @keyframes flicker {
+    0% { opacity: 0.97; }
+    5% { opacity: 0.95; }
+    10% { opacity: 0.9; }
+    15% { opacity: 0.95; }
+    20% { opacity: 0.99; }
+    100% { opacity: 0.94; }
+  }
+
+  .crt-flicker {
+    animation: flicker 0.15s infinite;
+  }
+
+  .arcade-btn {
+    box-shadow: 0 4px 0 #b91c85;
+    transition: all 0.1s;
+  }
+
+  .arcade-btn:active {
+    box-shadow: 0 0 0 #b91c85;
+    transform: translateY(4px);
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #1a1a2e;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--neon-cyan);
+    border-radius: 5px;
+  }
+
+  .grid-bg {
+    background-image: linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  canvas {
+    image-rendering: pixelated;
+  }
+</style>
+
+<script>
+  function toggleCRT() {
+    const body = document.body;
+    const overlay = document.getElementById('crt-overlay');
+    const btn = document.querySelector('[data-crt-toggle]') as HTMLButtonElement;
+
+    if (!overlay || !btn) return;
+
+    if (overlay.style.display === 'none') {
+      overlay.style.display = 'block';
+      body.classList.add('crt-flicker');
+      btn.innerText = 'CRT: ON';
+      btn.className =
+        'text-xs border-2 border-green-500 px-2 py-1 text-green-500 hover:bg-green-500 hover:text-black font-bold transition pixel-font';
+    } else {
+      overlay.style.display = 'none';
+      body.classList.remove('crt-flicker');
+      btn.innerText = 'CRT: OFF';
+      btn.className =
+        'text-xs border-2 border-red-500 px-2 py-1 text-red-500 hover:bg-red-500 hover:text-black font-bold transition pixel-font';
+    }
+  }
+
+  (window as any).toggleCRT = toggleCRT;
+</script>
