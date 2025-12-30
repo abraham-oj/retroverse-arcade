@@ -22,7 +22,7 @@ export class BreakoutGame implements Game {
   private bricks: Brick[] = [];
   private score = 0;
   private gameOver = false;
-  private win = false;
+  private isWin = false;
 
   init(): void {
     this.paddleX = 125;
@@ -30,7 +30,7 @@ export class BreakoutGame implements Game {
     this.bricks = [];
     this.score = 0;
     this.gameOver = false;
-    this.win = false;
+    this.isWin = false;
 
     // Crear ladrillos
     for (let c = 0; c < 5; c++) {
@@ -98,7 +98,7 @@ export class BreakoutGame implements Game {
     // Verificar victoria
     if (this.bricks.every(b => b.status === 0)) {
       this.gameOver = true;
-      this.win = true;
+      this.isWin = true;
     }
   }
 

@@ -1,6 +1,7 @@
 # Dependencias
 node_modules/
 .pnpm-store/
+package-lock.json
 
 # Build
 dist/
@@ -26,6 +27,7 @@ lerna-debug.log*
 # Editor
 .vscode/*
 !.vscode/extensions.json
+!.vscode/settings.json
 .idea/
 *.suo
 *.ntvs*
@@ -36,3 +38,9 @@ lerna-debug.log*
 
 # Local Netlify
 .netlify/
+
+# TypeScript
+*.tsbuildinfo
+
+# Astro
+.astro/

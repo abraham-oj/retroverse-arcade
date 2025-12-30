@@ -3,6 +3,15 @@ import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind';
 
 export default defineConfig({
-  integrations: [react(), tailwind()],
-  output: 'static'
+  integrations: [
+    react(),
+    tailwind()
+  ],
+  output: 'static',
+  site: 'https://retroverse-arcade.netlify.app',
+  vite: {
+    ssr: {
+      noExternal: ['lucide-react']
+    }
+  }
 });

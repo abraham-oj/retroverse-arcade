@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { SnakeGame } from '../games/snake';
 import { BreakoutGame } from '../games/breakout';
-import { Gamepad2 } from 'lucide-react';
+import { PacmanGame } from '../games/pacman';
+import { SpaceGame } from '../games/space';
+import { sounds } from '../utils/sounds';
+import { Gamepad2, Volume2, VolumeX } from 'lucide-react';
 import type { Game } from '../games/types';
 
 interface GameConsoleProps {
@@ -22,6 +25,8 @@ export default function GameConsole({ selectedGame }: GameConsoleProps) {
   const [overlayTitle, setOverlayTitle] = useState('READY PLAYER 1');
   const [gameTitle, setGameTitle] = useState('NEON SNAKE');
   const [gameDesc, setGameDesc] = useState('Usa las flechas para comer y crecer.');
+
+  const [soundEnabled, setSoundEnabled] = useState(true);
 
   // Cargar juego cuando cambia la selección
   useEffect(() => {
@@ -55,23 +60,10 @@ export default function GameConsole({ selectedGame }: GameConsoleProps) {
         gameRef.current = new BreakoutGame();
         break;
       case 'pacman':
+        gameRef.current = new PacmanGame();
+        break;
       case 'space':
-        // Placeholder para juegos no implementados
-        gameRef.current = {
-          title: gameId === 'pacman' ? 'PAC-GHOST' : 'GALACTIC',
-          desc: '🚧 Próximamente... Implementa este juego siguiendo el patrón de Snake!',
-          init: () => {},
-          update: () => {},
-          draw: (ctx: CanvasRenderingContext2D, size: number) => {
-            ctx.fillStyle = 'black';
-            ctx.fillRect(0, 0, size, size);
-            ctx.fillStyle = '#00ffff';
-            ctx.font = '16px "Press Start 2P"';
-            ctx.textAlign = 'center';
-            ctx.fillText('PRÓXIMAMENTE', size / 2, size / 2);
-          },
-          input: () => {}
-        };
+        gameRef.current = new SpaceGame();
         break;
       default:
         gameRef.current = new SnakeGame();
@@ -112,6 +104,9 @@ export default function GameConsole({ selectedGame }: GameConsoleProps) {
     setShowOverlay(false);
     setIsPlaying(true);
 
+    // Sonido de inicio
+    if (soundEnabled) sounds.start();
+
     intervalRef.current = window.setInterval(() => {
       if (!gameRef.current || !canvasRef.current) return;
       
@@ -122,7 +117,11 @@ export default function GameConsole({ selectedGame }: GameConsoleProps) {
       gameRef.current.draw(ctx, CANVAS_SIZE);
 
       if (gameRef.current.getScore) {
-        setScore(gameRef.current.getScore());
+        const newScore = gameRef.current.getScore();
+        if (newScore > score && soundEnabled) {
+          sounds.eat();
+        }
+        setScore(newScore);
       }
 
       if (gameRef.current.isGameOver && gameRef.current.isGameOver()) {
@@ -141,6 +140,12 @@ export default function GameConsole({ selectedGame }: GameConsoleProps) {
 
   const handleGameOver = (win = false) => {
     stopGame();
+    
+    // Sonidos
+    if (soundEnabled) {
+      if (win) sounds.victory();
+      else sounds.gameOver();
+    }
     
     const hsKey = `${selectedGame}HighScore`;
     const currentHS = localStorage.getItem(hsKey);
@@ -193,8 +198,22 @@ export default function GameConsole({ selectedGame }: GameConsoleProps) {
       </div>
 
       <div className="bg-black border-4 border-gray-700 p-2 rounded-lg shadow-2xl relative inline-block">
-        <div className="flex justify-between bg-gray-800 p-2 mb-2 font-mono text-xl border-b-2 border-gray-700">
+        <div className="flex justify-between items-center bg-gray-800 p-2 mb-2 font-mono text-xl border-b-2 border-gray-700">
           <span className="text-cyan-400">PTS: <span>{score}</span></span>
+          <button
+            onClick={() => {
+              const newState = sounds.toggle();
+              setSoundEnabled(newState);
+            }}
+            className="p-1 hover:bg-gray-700 rounded transition"
+            title={soundEnabled ? 'Silenciar' : 'Activar sonido'}
+          >
+            {soundEnabled ? (
+              <Volume2 className="w-5 h-5 text-green-400" />
+            ) : (
+              <VolumeX className="w-5 h-5 text-red-400" />
+            )}
+          </button>
           <span className="text-pink-500">HI: <span>{highScore}</span></span>
         </div>
 
